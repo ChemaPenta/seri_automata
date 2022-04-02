@@ -1,6 +1,6 @@
 /***************************************************
  * By Chema'22 v0.62RC 2022-04-02,  
- * Seginda versión nrta del sistema
+ * Segunda versión nrta del sistema
  * Seeguridad y pantalla
  * 
  * Pasar a botón selector manual/pedal (semi-auto)
