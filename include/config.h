@@ -1,6 +1,8 @@
 /***********************************************************************************
  *     Primera versión autómata serigrafía 
- * by Chema'22 v0.6RC
+ * by Chema'22 v0.7RC
+ *  Esta versión añade una pantalla Nextion para ajustar valores de pausas
+ *  podría ser otra pantalla HMI, pero esta estaba a mano
  * 
  * dos variadores de frecuencia 
  * VF1 pequeño (1HP) mueve delante detrás
