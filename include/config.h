@@ -33,7 +33,7 @@
  * A2 se pone a gnd al activar botón limpieza                           [    ]
  * A4 se pone a gnd al activar sistema semi-automático                  [ ]
  * 
- * ********************************************************************************/
+ * *********************************************************************************/
 
 #define activa LOW
 #define apaga HIGH
