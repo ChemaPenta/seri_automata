@@ -149,7 +149,7 @@ void leestops(){
     //int posv=0;
     //int posh=0;
   //upval=!digitalRead(endup); //endstops
-  int reading=!digitalRead(endup);
+  int reading=!digitalRead(endup); //Arriba
     //Serial.print(reading);
   if(reading != lastupval){
       lastDebounceUP=millis();
@@ -166,7 +166,7 @@ void leestops(){
 
 
   //downval=!digitalRead(enddown);
-  reading=!digitalRead(enddown);
+  reading=!digitalRead(enddown); //Abajo
     //Serial.print(reading);
   if(reading != lastdownval){
       lastDebounceDW=millis();

@@ -1,5 +1,5 @@
 /***********************************************************************************
- *     Primera versión autómata serigrafía para Seritrade-
+ *     Primera versión autómata serigrafía 
  * by Chema'22 v0.6RC
  * 
  * dos variadores de frecuencia 
@@ -16,21 +16,22 @@
  * D3 esta a gnd si no está activado (final de carrera arriba VF2)      [1]
  * D5 esta a gnd si no está activado (final de carrera abajo VF2)       [2]
  * 
- * D7 esta a gnd si no está activado (final de carrera delante VF1)     [3]
- * D9 esta a gnd si no está activado (final de carrera detrás VF1)      [4]
+ * D7 esta a gnd si está activado (final de carrera delante VF1)        [3]
+ * D9 esta a gnd si está activado (final de carrera detrás VF1)         [4]
  * 
  * D11 activa por relé un juego de válvulas de aire (1)                 K6 (amarillo)
  * D12 activa por relé un juego de válvulas de aire (2)                 K7 (naranja)
  * 
- * libre K8 (rojo)
- * Vcc K (marrón)
- * Gnd K (negro)
+ * libre                                                                K8 (rojo)
+ * Vcc                                                                  K0 (marrón)
+ * Gnd                                                                  K9 (negro)
  * 
  * A0 se pone en gnd al pulsar el pedal de inicio maniobra              [0]
  * 
  * A1 se pone a gnd al pulsar el botón de flechas horizontales          [10]
  * A3 se pone a gnd al pulsar el botón de flechas verticales            [6]
  * A2 se pone a gnd al activar botón limpieza                           [    ]
+ * A4 se pone a gnd al activar sistema semi-automático                  [ ]
  * 
  * ********************************************************************************/
 
