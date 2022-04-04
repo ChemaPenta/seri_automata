@@ -12,7 +12,9 @@
  * VF2 => arriba/abajo
  * VF1 => delante/detrás
  *
- * 
+ * falta escribir la rutina para leer y grabar eeprom 
+ * con las variables de las tres pausas
+ * y pasarlo todo al Nextion
  * *****************************************************/
 
 void leebotonera(){
@@ -302,14 +304,25 @@ void checkbut(void){
                     break;
                 case ATRAS_ABAJO:
                     //atras abajo
-                    mueveVF1(TOFRONT);
+                    //Pausa antes de arrancar DESPEGUE
+                    if(pausado4){
+                        unsigned long currentm=millis();
+                        if(currentm-timePause4 >= Despegue){ //DESPEGUE
+                            mueveVF1(TOFRONT);
+                            pausado4 = false;
+                        }
+                    }else{
+                        pausado4=true;
+                        timePause4=millis();
+                    }
+                    
                     break;
                 case DELANTE_ARRIBA:
                     //delante arriba
                     //Pausa???????????????????????????
                     if(pausado3){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
-                        if(currentm-timePause3 >= timePauseVal){
+                        if(currentm-timePause3 >= Retener){ //RETENER
                             mueveVF1(TOBACK);
                             pausado3 = false;
                         }
@@ -326,7 +339,7 @@ void checkbut(void){
                     if(pausado2){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
                         if(DEBUG) Serial.print("estamos esperando");
-                        if(currentm-timePause2 >= timePauseVal){
+                        if(currentm-timePause2 >= Espera){ //ESPERA
                             mueveVF2(TOUP);
                             pausado2 = false;
                             if(!limpieza) valvulas(true);
@@ -399,4 +412,31 @@ void checkbut(void){
             //cambios=true;
         }
     }
+}
+
+void leemeEEprom() {
+  int eeAddress = 0;
+  EEPROM.get( eeAddress, Tcal );
+
+  if (Tcal < 50 or Tcal > 95) {
+    Tcal = 75;
+    EEPROM.put(eeAddress, Tcal);
+  }
+  eeAddress += sizeof(int);
+  EEPROM.get( eeAddress, Tempacs );
+
+  if (Tempacs < 25 or Tempacs > 60) {
+    Tempacs = 40;
+    EEPROM.put(eeAddress, Tempacs);
+  }
+
+}
+
+void grabaEEprom() {
+  int eeAddress = 0;
+  EEPROM.update( eeAddress, Tcal );
+
+  eeAddress += sizeof(int);
+  EEPROM.update( eeAddress, Tempacs );
+
 }

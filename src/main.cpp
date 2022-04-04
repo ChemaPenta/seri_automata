@@ -32,7 +32,6 @@
  * *************************************************/
 
 #include <Arduino.h>
-//#include<EEPROM.h>
 #include "config.h"
 
 unsigned long lastDebounceTh = 0;
@@ -53,10 +52,14 @@ unsigned long timeValve=0;
 unsigned long timePause=0;
 unsigned long timePause2=0;
 unsigned long timePause3=0;
+unsigned long timePause4=0;
 
 //estos dos timepos se deberían poder regular por pantalla...
-unsigned long timePauseVal=700; // pausa en semi-automático
-unsigned long PauseValve=500; //tiempo de espera para el cambio de válvulas delante
+unsigned long timePauseVal=700; // pausa en semi-automático ESPERA
+unsigned long PauseValve=500; //tiempo de espera para el cambio de válvulas delante RETENER
+unsigned long Espera=0; // pausa en semi-automático ESPERA
+unsigned long Retener=0; //tiempo de espera para el cambio de válvulas delante RETENER
+unsigned long Despegue=0; //tiempo de espera atrás antes de arrancar DESPEGUE
 
 unsigned long HeartB=0;
 uint8_t hbstate=false; //hearbeat
@@ -107,48 +110,64 @@ uint8_t lastvval=false;     //botón vertical anterior
 uint8_t pausado=false;
 uint8_t pausado2=false;
 uint8_t pausado3=false;
+uint8_t pausado4=false;
+
+// Nextion Objects
+// (page id, component id, component name)
+
+NexNumber nexespera = NexNumber(1, 6, "time01"); 
+NexNumber nexretener = NexNumber(2, 7, "time02"); 
+NexNumber nexdespegue = NexNumber(3, 7, "time03"); 
 
 void setup()
 {
-pinMode(endup,INPUT_PULLUP);
-pinMode(enddown,INPUT_PULLUP);
-pinMode(endfront,INPUT_PULLUP);
-pinMode(endback,INPUT_PULLUP);
-digitalWrite(endfront,HIGH);
-digitalWrite(endback,HIGH);
-pinMode(pedal,INPUT_PULLUP);
-pinMode(lbutt,INPUT_PULLUP);
-digitalWrite(lbutt,HIGH);
-pinMode(semibutt,INPUT_PULLUP);
-digitalWrite(semibutt,HIGH);
 
-pinMode(LED_BUILTIN,OUTPUT);
-digitalWrite(LED_BUILTIN,LOW);
+  //Serial.begin(115200);
+  Serial.begin(9600);
+  nexInit();
+
+  pinMode(endup,INPUT_PULLUP);
+  pinMode(enddown,INPUT_PULLUP);
+  pinMode(endfront,INPUT_PULLUP);
+  pinMode(endback,INPUT_PULLUP);
+  digitalWrite(endfront,HIGH);
+  digitalWrite(endback,HIGH);
+  pinMode(pedal,INPUT_PULLUP);
+  pinMode(lbutt,INPUT_PULLUP);
+  digitalWrite(lbutt,HIGH);
+  pinMode(semibutt,INPUT_PULLUP);
+  digitalWrite(semibutt,HIGH);
+
+  pinMode(LED_BUILTIN,OUTPUT);
+  digitalWrite(LED_BUILTIN,LOW);
 
 
-pinMode(horz,INPUT_PULLUP);
-pinMode(vert,INPUT_PULLUP);
+  pinMode(horz,INPUT_PULLUP);
+  pinMode(vert,INPUT_PULLUP);
 
-pinMode(VF1p,OUTPUT);
-pinMode(VF1dir,OUTPUT);
-pinMode(VF1speed,OUTPUT);
-digitalWrite(VF1p,HIGH);
-digitalWrite(VF1dir,HIGH);
-digitalWrite(VF1speed,HIGH);
+  pinMode(VF1p,OUTPUT);
+  pinMode(VF1dir,OUTPUT);
+  pinMode(VF1speed,OUTPUT);
+  digitalWrite(VF1p,HIGH);
+  digitalWrite(VF1dir,HIGH);
+  digitalWrite(VF1speed,HIGH);
 
-pinMode(VF2p,OUTPUT);
-pinMode(VF2dir,OUTPUT);
-digitalWrite(VF2p,HIGH);
-digitalWrite(VF2dir,HIGH);
+  pinMode(VF2p,OUTPUT);
+  pinMode(VF2dir,OUTPUT);
+  digitalWrite(VF2p,HIGH);
+  digitalWrite(VF2dir,HIGH);
 
-pinMode(air1,OUTPUT);
-digitalWrite(air1,HIGH);
-pinMode(air2,OUTPUT);
-digitalWrite(air2,HIGH);
+  pinMode(air1,OUTPUT);
+  digitalWrite(air1,HIGH);
+  pinMode(air2,OUTPUT);
+  digitalWrite(air2,HIGH);
 
-HeartB=millis();
+  HeartB=millis();
 
-Serial.begin(9600);
+  leemeEEprom();
+  nexespera.setValue(Tcal);
+  nexretener.setValue(Tempacs);
+  nexdespegue.setValue(Tempacs);
 
 
 }

@@ -37,6 +37,9 @@
  * 
  * *********************************************************************************/
 
+#include <EEPROM.h>
+#include <Nextion.h>
+
 #define activa LOW
 #define apaga HIGH
 
