@@ -416,27 +416,58 @@ void checkbut(void){
 
 void leemeEEprom() {
   int eeAddress = 0;
-  EEPROM.get( eeAddress, Tcal );
+  EEPROM.get( eeAddress, Espera );
 
-  if (Tcal < 50 or Tcal > 95) {
-    Tcal = 75;
-    EEPROM.put(eeAddress, Tcal);
+  if (Espera < 0 or Espera > 10000) {
+    Espera = 0;
+    EEPROM.put(eeAddress, Espera);
   }
-  eeAddress += sizeof(int);
-  EEPROM.get( eeAddress, Tempacs );
+  eeAddress += sizeof(unsigned long);
+  EEPROM.get( eeAddress, Retener );
 
-  if (Tempacs < 25 or Tempacs > 60) {
-    Tempacs = 40;
-    EEPROM.put(eeAddress, Tempacs);
+  if (Retener < 0 or Retener > 10000) {
+    Retener = 0;
+    EEPROM.put(eeAddress, Retener);
   }
+  eeAddress += sizeof(unsigned long);
+  EEPROM.get( eeAddress, Despegue );
 
+  if (Despegue < 0 or Despegue > 10000) {
+    Despegue = 0;
+    EEPROM.put(eeAddress, Despegue);
+  }
 }
 
 void grabaEEprom() {
   int eeAddress = 0;
-  EEPROM.update( eeAddress, Tcal );
+  EEPROM.update( eeAddress, Espera );
 
-  eeAddress += sizeof(int);
-  EEPROM.update( eeAddress, Tempacs );
+  eeAddress += sizeof(unsigned long);
+  EEPROM.update( eeAddress, Retener );
 
+  eeAddress += sizeof(unsigned long);
+  EEPROM.update( eeAddress, Despegue );  
+
+}
+
+void leenex() {
+  uint32_t number;
+  nexespera.getValue(&number);
+  if (number != Espera && number => 0 && number <= 10000){
+    Espera=(unsigned long)number;
+    grabaEEprom();
+  }
+  
+  nexretener.getValue(&number);
+  if (number != Retener && number => 0 && number <= 10000){
+    Retener=(unsigned long)number;
+    grabaEEprom();
+  }
+
+    nexdespegue.getValue(&number);
+  if (number != Despegue && number => 0 && number <= 10000){
+    Despegue=(unsigned long)number;
+    grabaEEprom();
+  }
+  
 }

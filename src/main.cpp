@@ -55,8 +55,8 @@ unsigned long timePause3=0;
 unsigned long timePause4=0;
 
 //estos dos timepos se deberían poder regular por pantalla...
-unsigned long timePauseVal=700; // pausa en semi-automático ESPERA
-unsigned long PauseValve=500; //tiempo de espera para el cambio de válvulas delante RETENER
+//unsigned long timePauseVal=700; // pausa en semi-automático ESPERA
+//unsigned long PauseValve=500; //tiempo de espera para el cambio de válvulas delante RETENER
 unsigned long Espera=0; // pausa en semi-automático ESPERA
 unsigned long Retener=0; //tiempo de espera para el cambio de válvulas delante RETENER
 unsigned long Despegue=0; //tiempo de espera atrás antes de arrancar DESPEGUE
@@ -119,6 +119,8 @@ NexNumber nexespera = NexNumber(1, 6, "time01");
 NexNumber nexretener = NexNumber(2, 7, "time02"); 
 NexNumber nexdespegue = NexNumber(3, 7, "time03"); 
 
+#include "functions.h"
+
 void setup()
 {
 
@@ -165,14 +167,13 @@ void setup()
   HeartB=millis();
 
   leemeEEprom();
-  nexespera.setValue(Tcal);
-  nexretener.setValue(Tempacs);
-  nexdespegue.setValue(Tempacs);
+  nexespera.setValue(Espera);
+  nexretener.setValue(Retener);
+  nexdespegue.setValue(Despegue);
 
 
 }
 
-#include "functions.h"
 
 
 void loop()
@@ -184,12 +185,7 @@ void loop()
     hbstate=!hbstate;
     digitalWrite(13,hbstate);
   } 
-    /*
-    if((currentm-timeValve >= PauseValve) && valves){ //pausa para cambio de válvulas enfrente
-      valvulas(true);
-      valves=false;
-    }
-    */
+
 
     //primero los botones
     leebotonera();
@@ -198,75 +194,48 @@ void loop()
     leestops();
 
     //esto es debugging
-    if(DEBUG){
-    if (cambios){
-      printa();
-      cambios=false;
-    } }
-//printa();
+        if(DEBUG){
+        if (cambios){
+          printa();
+          cambios=false;
+        } }
+
     checkbut(); //comprobamos pulsadores y pedal
 
-     // switch (movement) //comprueba los movimientos
-      //{
-      //case PARRIBA: //2
-          if(upval) {
-              //position-=1;
-              if(semiauto==0) if(vval) paradav=true;
-              if(movement==PARRIBA) para(VF2);
-          }
-        //  break;
-      //case PABAJO: //1
-          if(downval){
-              //position+=1;
-              /*
-              if(DEBUG) {
-                Serial.print(movement);
-                Serial.print("*************************");
-              }
-              */
-              if(semiauto==0) if(vval) paradav=true;
-              if(movement==PABAJO) para(VF2);
-          }
-        //  break;
-      //case PALANTE: //3
-          if(frontval){
-              //position+=2;
-              /*
-              if(DEBUG) {
-                Serial.print(movement);
-                Serial.print("*************************");
-                
-              } */
-              if(movement==PALANTE){ 
-                para(VF1);
-                //if(DEBUG) Serial.print("Palante y para");
-              }
-              if (semiauto==0) {
-                if(hval) paradah=true;
-              if(limpieza==0) {
-                //timeValve=millis();
-                //timePause=timeValve;
-                //pausado=true;
-                //valves=true;
-                valvulas(true);
-              }}
-          }
-        //  break;
+    //Pasamos a comprobar endstops
 
-      //case PATRAS: //4
-          if(backval){
-              //position-=2;
-              if(movement==PATRAS) para(VF1);
-              valvulas(false);
-              if (semiauto==0) if(hval) paradah=true;
-          }
-        //  break;
+    if(upval) {
+        //position-=1;
+        if(semiauto==0) if(vval) paradav=true;
+        if(movement==PARRIBA) para(VF2);
+    }
 
-         // case PARADO: //0
-         //   if(hval) paradah=true;
-         //   if(vval) paradav=true;
-         // break;
-      //}
+    if(downval){
+        //position+=1;
+
+        if(semiauto==0) if(vval) paradav=true;
+        if(movement==PABAJO) para(VF2);
+    }
+
+    if(frontval){
+        //position+=2;
+        if(movement==PALANTE){ 
+          para(VF1);
+        }
+
+        if (semiauto==0) {
+          if(hval) paradah=true;
+        if(limpieza==0) {
+          valvulas(true);
+        }}
+    }
  
+    if(backval){
+        //position-=2;
+        if(movement==PATRAS) para(VF1);
+        valvulas(false);
+        if (semiauto==0) if(hval) paradah=true;
+    }
+
   
 }
