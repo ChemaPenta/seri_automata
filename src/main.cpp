@@ -1,7 +1,24 @@
 /***************************************************
- * By Chema'22 v0.62RC 2022-04-02,  
- * Segunda versión beta del sistema
- * Seeguridad y pantalla
+ * SeriAuto programa para ejecutar en Arduino Nano
+ * para controlar equipo de serigrafía 
+ * Copyright (C) 2022  Chema Muñoz
+
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * v0.62RC 2022-04-02,  
+ * Primera versión beta en github
+ * Seguridad y pantalla
  * 
  * Pasar a botón selector manual/pedal (semi-auto)
  * 
@@ -25,9 +42,9 @@
  * Estamos en proceso de pruebas en la máquina
  * de Seritrade, un par de semanas y a producción
  * 
- * Podría añadir una pantalla tipo Nextion
+ * Se añade una pantalla tipo Nextion
  * por puerto serie para configurar las pausas
- * A agregar en la v1.0 junto a grabar las
+ * además de grabar estas
  * configuraciones en EEPROM
  * *************************************************/
 
