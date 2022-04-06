@@ -19,7 +19,6 @@
 
 void leebotonera(){
 
-  //pedalval=!digitalRead(pedal); //pedal 
   int reading=!digitalRead(pedal); //pedal 
   if(reading != lastP){
       lastDebounceTP=millis();
@@ -32,7 +31,6 @@ void leebotonera(){
       }
   }
 
-  //hval=!digitalRead(horz); //boton delante/detrás
   reading = !digitalRead(horz); //boton delante/detrás
   //if(hval != lasthval){
   if(reading != lasthval){
@@ -46,9 +44,8 @@ void leebotonera(){
         //cambios=true;
       }
   }
-  reading=!digitalRead(vert);
-  //vval=!digitalRead(vert); //botón subir/bajar
-  //if(vval != lastvval){
+  reading=!digitalRead(vert); //botón subir/bajar
+
   if(reading != lastvval){
       lastDebounceTv=millis();
       lastvval=reading;
@@ -56,13 +53,12 @@ void leebotonera(){
   if((millis()-lastDebounceTv)>=debounceDelay){
       if(reading != vval){
           vval=reading;
-          //lastvval=vval;
-          //cambios=true;
+
       }
   }
-    reading=!digitalRead(lbutt); //boton limpieza
-    //limpieza=!digitalRead(lbutt); //boton limpieza
-  if(reading != lastlimpieza){
+    reading=!digitalRead(lbutt); //boton limpieza ******pasará a ser sensor presencia******
+
+/*   if(reading != lastlimpieza){
       lastDebounceLP=millis();
       lastlimpieza=reading;
   }
@@ -71,10 +67,10 @@ void leebotonera(){
           limpieza=reading;
           cambios=true;
       }
-  }
-    reading=!digitalRead(semibutt); //botón semiauto
-    //semiauto=!digitalRead(semibutt); //botón semiauto
-  if(reading != lastsemiauto){
+  } */
+    reading=!digitalRead(semibutt); //botón semiauto ******pasará a desuso por pantalla********
+
+/*   if(reading != lastsemiauto){
       lastDebounceSE=millis();
       lastsemiauto=reading;
   }
@@ -83,8 +79,9 @@ void leebotonera(){
           semiauto=reading;
           cambios=true;
       }
-  }
+  } */
 
+    //nexsemiauto;
 }
 void printa()
 {
@@ -148,9 +145,7 @@ void printa()
   //delay(2000);
 }
 void leestops(){
-    //int posv=0;
-    //int posh=0;
-  //upval=!digitalRead(endup); //endstops
+  
   int reading=!digitalRead(endup); //Arriba
     //Serial.print(reading);
   if(reading != lastupval){
@@ -453,19 +448,19 @@ void grabaEEprom() {
 void leenex() {
   uint32_t number;
   nexespera.getValue(&number);
-  if (number != Espera && number => 0 && number <= 10000){
+  if (number != Espera && number >= 0 && number <= 10000){
     Espera=(unsigned long)number;
     grabaEEprom();
   }
   
   nexretener.getValue(&number);
-  if (number != Retener && number => 0 && number <= 10000){
+  if (number != Retener && number >= 0 && number <= 10000){
     Retener=(unsigned long)number;
     grabaEEprom();
   }
 
     nexdespegue.getValue(&number);
-  if (number != Despegue && number => 0 && number <= 10000){
+  if (number != Despegue && number >= 0 && number <= 10000){
     Despegue=(unsigned long)number;
     grabaEEprom();
   }

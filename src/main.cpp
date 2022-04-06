@@ -1,5 +1,5 @@
 /***************************************************
- * SeriAuto programa para ejecutar en Arduino Nano
+ * SeriAuto programa a ejecutar en Arduino Nano
  * para controlar equipo de serigrafía 
  * Copyright (C) 2022  Chema Muñoz
 
@@ -99,8 +99,8 @@ uint8_t movev=false;
 uint8_t movevu;
 uint8_t movevd;
 */
-uint8_t limpieza=false;
-uint8_t lastlimpieza=false;
+uint32_t limpieza=false; //selector limpieza
+//uint8_t lastlimpieza=false;
 uint8_t pedal2=false;
 uint8_t paradah=false;
 uint8_t paradav=false;
@@ -116,9 +116,9 @@ uint8_t lastfrontval;
 uint8_t lastbackval;
 
 uint8_t pedalval=false; //botón pedal
-uint8_t semiauto; //selector semiauto/manual
-uint8_t lastsemiauto; //selector semiauto/manual
-uint8_t lastP=false;
+uint32_t semiauto = false; //selector semiauto/manual
+//uint8_t lastsemiauto; //selector semiauto/manual
+uint8_t lastP=false; //intermedio pedal
 uint8_t hval=false;     //botón horizontal
 uint8_t vval=false;     //botón vertical
 uint8_t lasthval=false;     //botón horizontal anterior
@@ -135,6 +135,20 @@ uint8_t pausado4=false;
 NexNumber nexespera = NexNumber(1, 6, "time01"); 
 NexNumber nexretener = NexNumber(2, 7, "time02"); 
 NexNumber nexdespegue = NexNumber(3, 7, "time03"); 
+NexDSButton nexsemi = NexDSButton(0,2,"SemiAuto");
+NexDSButton nexlimpia =NexDSButton(0,3,"limpieza");
+
+NexTouch *nex_listen_list[] = {
+  &nexsemi, &nexlimpia, NULL
+};
+
+void semi_pulsado(void *ptr) {
+  semiauto = !semiauto;
+}
+
+void limpia_pulsado(void *ptr) {
+  limpieza = !limpieza;
+}
 
 #include "functions.h"
 
@@ -144,6 +158,9 @@ void setup()
   //Serial.begin(115200);
   Serial.begin(9600);
   nexInit();
+
+  nexsemi.attachPop(semi_pulsado, &nexsemi);
+  nexlimpia.attachPop(limpia_pulsado, &nexlimpia);
 
   pinMode(endup,INPUT_PULLUP);
   pinMode(enddown,INPUT_PULLUP);
@@ -203,6 +220,7 @@ void loop()
     digitalWrite(13,hbstate);
   } 
 
+  nexLoop(nex_listen_list);
 
     //primero los botones
     leebotonera();
