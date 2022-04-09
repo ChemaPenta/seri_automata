@@ -59,8 +59,8 @@ unsigned long lastDebounceUP = 0;
 unsigned long lastDebounceDW = 0;
 unsigned long lastDebounceFR = 0;
 unsigned long lastDebounceBK = 0;
-unsigned long lastDebounceLP = 0;
-unsigned long lastDebounceSE = 0;
+unsigned long lastDebounceAL = 0;
+unsigned long lastDebounceAC = 0;
 
 unsigned long debounceDelay = 60;
 unsigned long debounceDelayS = 20;
@@ -71,12 +71,16 @@ unsigned long timePause2=0;
 unsigned long timePause3=0;
 unsigned long timePause4=0;
 
-//estos dos timepos se deberían poder regular por pantalla...
-//unsigned long timePauseVal=700; // pausa en semi-automático ESPERA
-//unsigned long PauseValve=500; //tiempo de espera para el cambio de válvulas delante RETENER
-unsigned long Espera=0; // pausa en semi-automático ESPERA
+/* unsigned long Espera=0; // pausa en semi-automático ESPERA
 unsigned long Retener=0; //tiempo de espera para el cambio de válvulas delante RETENER
-unsigned long Despegue=0; //tiempo de espera atrás antes de arrancar DESPEGUE
+unsigned long Despegue=0; //tiempo de espera atrás antes de arrancar DESPEGUE 
+
+uint32_t Espera=0; // pausa en semi-automático ESPERA
+uint32_t Retener=0; //tiempo de espera para el cambio de válvulas delante RETENER
+uint32_t Despegue=0; //tiempo de espera atrás antes de arrancar DESPEGUE
+*/
+
+tiempos_STR tiempos;
 
 unsigned long HeartB=0;
 uint8_t hbstate=false; //hearbeat
@@ -86,19 +90,7 @@ uint8_t movement=0;
 uint8_t valves=false;
 
 uint8_t position=0; //posición actual
-/*
-uint8_t hdirf=false;
-uint8_t hdirb=false;
-uint8_t vdir=false; //hacia arriba)
-uint8_t pedalact=false;
-uint8_t manual=true;
-uint8_t moveh=false;
-uint8_t movehf;
-uint8_t movehb;
-uint8_t movev=false;
-uint8_t movevu;
-uint8_t movevd;
-*/
+
 uint32_t limpieza=false; //selector limpieza
 //uint8_t lastlimpieza=false;
 uint8_t pedal2=false;
@@ -114,6 +106,13 @@ uint8_t lastupval;
 uint8_t lastdownval;
 uint8_t lastfrontval;
 uint8_t lastbackval;
+
+uint8_t alarma=false;
+uint8_t lastalarma;
+uint8_t EstadoAlarma=false;
+
+uint8_t activado=true;
+uint8_t lastactivado;
 
 uint8_t pedalval=false; //botón pedal
 uint32_t semiauto = false; //selector semiauto/manual
@@ -132,25 +131,44 @@ uint8_t pausado4=false;
 // Nextion Objects
 // (page id, component id, component name)
 
-NexNumber nexespera = NexNumber(1, 6, "time01"); 
-NexNumber nexretener = NexNumber(2, 7, "time02"); 
-NexNumber nexdespegue = NexNumber(3, 7, "time03"); 
-NexDSButton nexsemi = NexDSButton(0,2,"SemiAuto");
-NexDSButton nexlimpia =NexDSButton(0,3,"limpieza");
+NexNumber nexespera = NexNumber(0, 6, "t1"); 
+NexNumber nexretener = NexNumber(0, 7, "t2"); 
+NexNumber nexdespegue = NexNumber(0, 8, "t3"); 
+NexDSButton nexsemi = NexDSButton(0, 2, "s");
+NexDSButton nexlimpia =NexDSButton(0, 3, "l");
+NexButton nexsalir_espera = NexButton(1, 4, "b3");
+NexButton nexsalir_retener = NexButton(2, 3, "b3");
+NexButton nexsalir_despegue = NexButton(3, 3, "b3");
+NexPage Alarm = NexPage(4, 0, "Alarm");
+NexPage pral = NexPage(0, 0, "page0");
 
 NexTouch *nex_listen_list[] = {
-  &nexsemi, &nexlimpia, NULL
+  &nexsemi, &nexlimpia, &nexsalir_espera, &nexsalir_retener, &nexsalir_despegue, NULL
 };
+
+#include "functions.h"
 
 void semi_pulsado(void *ptr) {
   semiauto = !semiauto;
+
+  nexespera.setValue(tiempos.Espera);
+  nexretener.setValue(tiempos.Retener);
+  nexdespegue.setValue(tiempos.Despegue);
 }
 
 void limpia_pulsado(void *ptr) {
   limpieza = !limpieza;
+
+  leemeEEprom();
+  nexespera.setValue(tiempos.Espera);
+  nexretener.setValue(tiempos.Retener);
+  nexdespegue.setValue(tiempos.Despegue);
 }
 
-#include "functions.h"
+void tiempo_pulsado(void *ptr) {
+  //lee todos los timings y ponlos en las variables y en la EEPROM
+  leenex();
+}
 
 void setup()
 {
@@ -161,6 +179,9 @@ void setup()
 
   nexsemi.attachPop(semi_pulsado, &nexsemi);
   nexlimpia.attachPop(limpia_pulsado, &nexlimpia);
+  nexsalir_espera.attachPop(tiempo_pulsado, &nexsalir_espera);
+  nexsalir_retener.attachPop(tiempo_pulsado, &nexsalir_retener);
+  nexsalir_despegue.attachPop(tiempo_pulsado, &nexsalir_despegue);
 
   pinMode(endup,INPUT_PULLUP);
   pinMode(enddown,INPUT_PULLUP);
@@ -201,76 +222,109 @@ void setup()
   HeartB=millis();
 
   leemeEEprom();
-  nexespera.setValue(Espera);
-  nexretener.setValue(Retener);
-  nexdespegue.setValue(Despegue);
-
+  nexespera.setValue(tiempos.Espera);
+  nexretener.setValue(tiempos.Retener);
+  nexdespegue.setValue(tiempos.Despegue);
 
 }
 
-
-
 void loop()
 {
+  
+  nexLoop(nex_listen_list);
+
   //Hearbeat...
   unsigned long currentm=millis();
-  if((currentm-HeartB) >= 500){
+  unsigned long latido=800;
+  
+  (limpieza || semiauto) ? latido = 100 : latido = 600;
+  
+  if((currentm-HeartB) >= latido){
     HeartB=currentm;
     hbstate=!hbstate;
     digitalWrite(13,hbstate);
   } 
 
-  nexLoop(nex_listen_list);
-
     //primero los botones
     leebotonera();
 
-    //después leo los endstops
-    leestops();
+    if(activado){ //botón de activación encendido, procedemos
+      if(EstadoAlarma){
+          //ha saltado la alarma loop sin hacer otra cosa que subir
+          
+          leestops();
+          
+          if(upval){
+            para(VF2);
+          }else{
+            mueveVF2(TOUP);
+          }
 
-    //esto es debugging
-        if(DEBUG){
-        if (cambios){
-          printa();
-          cambios=false;
-        } }
+      }else{ //no hay estado de alarma, actuamos normal
 
-    checkbut(); //comprobamos pulsadores y pedal
+        if(alarma){ //Salta la alarma
 
-    //Pasamos a comprobar endstops
+          EstadoAlarma=true;
+          Alarm.show();
 
-    if(upval) {
-        //position-=1;
-        if(semiauto==0) if(vval) paradav=true;
-        if(movement==PARRIBA) para(VF2);
+        }else{ //No hay alarma, así que normal
+        
+          //leo los endstops
+          leestops();
+
+          //esto es debugging
+/*               if(DEBUG){
+                if (cambios){
+                  printa();
+                  cambios=false;
+                } 
+              } */
+
+          checkbut(); //comprobamos pulsadores y pedal
+
+          if(upval) {
+              //position-=1;
+              if(semiauto==0) if(vval) paradav=true;
+              if(movement==PARRIBA) para(VF2);
+          }
+
+          if(downval){
+              //position+=1;
+
+              if(semiauto==0) if(vval) paradav=true;
+              if(movement==PABAJO) para(VF2);
+          }
+
+          if(frontval){
+              //position+=2;
+              if(movement==PALANTE){ 
+                para(VF1);
+              }
+
+              if (semiauto==0) {
+                if(hval) paradah=true;
+              if(limpieza==0) {
+                valvulas(true);
+              }}
+          }
+      
+          if(backval){
+              //position-=2;
+              if(movement==PATRAS) para(VF1);
+              valvulas(false);
+              if (semiauto==0) if(hval) paradah=true;
+          }
+
+        } 
+      } 
+    } else { //Botón de activación en OFF, nada se mueve
+      //por si acaso se desactiva durante movimiento, paramos motores
+      para(VF1);
+      para(VF2);
+
+      if(EstadoAlarma) pral.show();
+
+      EstadoAlarma=false;
+      
     }
-
-    if(downval){
-        //position+=1;
-
-        if(semiauto==0) if(vval) paradav=true;
-        if(movement==PABAJO) para(VF2);
-    }
-
-    if(frontval){
-        //position+=2;
-        if(movement==PALANTE){ 
-          para(VF1);
-        }
-
-        if (semiauto==0) {
-          if(hval) paradah=true;
-        if(limpieza==0) {
-          valvulas(true);
-        }}
-    }
- 
-    if(backval){
-        //position-=2;
-        if(movement==PATRAS) para(VF1);
-        valvulas(false);
-        if (semiauto==0) if(hval) paradah=true;
-    }
-
-  
 }

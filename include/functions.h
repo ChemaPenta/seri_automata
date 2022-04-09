@@ -56,30 +56,30 @@ void leebotonera(){
 
       }
   }
-    reading=!digitalRead(lbutt); //boton limpieza ******pasará a ser sensor presencia******
+    reading=digitalRead(lbutt); //boton limpieza ******pasará a ser sensor presencia/alarma******
 
-/*   if(reading != lastlimpieza){
-      lastDebounceLP=millis();
-      lastlimpieza=reading;
+   if(reading != lastalarma){
+      lastDebounceAL=millis();
+      lastalarma=reading;
   }
-  if((millis()-lastDebounceLP)>=debounceDelay){
-      if(reading != limpieza){
-          limpieza=reading;
+  if((millis()-lastDebounceAL)>=debounceDelay){
+      if(reading != alarma){
+          alarma=reading;
           cambios=true;
       }
-  } */
-    reading=!digitalRead(semibutt); //botón semiauto ******pasará a desuso por pantalla********
+  } 
+   reading=!digitalRead(semibutt); //botón semiauto ******pasará a activación********
 
-/*   if(reading != lastsemiauto){
-      lastDebounceSE=millis();
-      lastsemiauto=reading;
+   if(reading != lastactivado){
+      lastDebounceAC=millis();
+      lastactivado=reading;
   }
-  if((millis()-lastDebounceSE)>=debounceDelay){
-      if(reading != semiauto){
-          semiauto=reading;
+  if((millis()-lastDebounceAC)>=debounceDelay){
+      if(reading != activado){
+          activado=reading;
           cambios=true;
       }
-  } */
+  } 
 
     //nexsemiauto;
 }
@@ -302,7 +302,7 @@ void checkbut(void){
                     //Pausa antes de arrancar DESPEGUE
                     if(pausado4){
                         unsigned long currentm=millis();
-                        if(currentm-timePause4 >= Despegue){ //DESPEGUE
+                        if(currentm-timePause4 >= tiempos.Despegue){ //DESPEGUE
                             mueveVF1(TOFRONT);
                             pausado4 = false;
                         }
@@ -317,7 +317,7 @@ void checkbut(void){
                     //Pausa???????????????????????????
                     if(pausado3){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
-                        if(currentm-timePause3 >= Retener){ //RETENER
+                        if(currentm-timePause3 >= tiempos.Retener){ //RETENER
                             mueveVF1(TOBACK);
                             pausado3 = false;
                         }
@@ -334,7 +334,7 @@ void checkbut(void){
                     if(pausado2){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
                         if(DEBUG) Serial.print("estamos esperando");
-                        if(currentm-timePause2 >= Espera){ //ESPERA
+                        if(currentm-timePause2 >= tiempos.Espera){ //ESPERA
                             mueveVF2(TOUP);
                             pausado2 = false;
                             if(!limpieza) valvulas(true);
@@ -409,7 +409,7 @@ void checkbut(void){
     }
 }
 
-void leemeEEprom() {
+/* void leemeEEprom() {
   int eeAddress = 0;
   EEPROM.get( eeAddress, Espera );
 
@@ -417,52 +417,78 @@ void leemeEEprom() {
     Espera = 0;
     EEPROM.put(eeAddress, Espera);
   }
-  eeAddress += sizeof(unsigned long);
+  eeAddress += sizeof(uint32_t);
   EEPROM.get( eeAddress, Retener );
 
   if (Retener < 0 or Retener > 10000) {
     Retener = 0;
     EEPROM.put(eeAddress, Retener);
   }
-  eeAddress += sizeof(unsigned long);
+  eeAddress += sizeof(uint32_t);
   EEPROM.get( eeAddress, Despegue );
 
   if (Despegue < 0 or Despegue > 10000) {
     Despegue = 0;
     EEPROM.put(eeAddress, Despegue);
   }
+} */
+
+void leemeEEprom() {
+  int eeAddress = 0;
+  uint8_t graba=false;
+  EEPROM.get( eeAddress, tiempos );
+
+  if (tiempos.Espera < 0 or tiempos.Espera > 10000) {
+    tiempos.Espera = 0;
+    graba=true;
+  }
+  
+  if (tiempos.Retener < 0 or tiempos.Retener > 10000) {
+    tiempos.Retener = 0;
+    graba=true;
+  }
+
+  if (tiempos.Despegue < 0 or tiempos.Despegue > 10000) {
+    tiempos.Despegue = 0;
+    graba=true;
+  }
+  if(graba) EEPROM.put(eeAddress,tiempos);
 }
 
 void grabaEEprom() {
   int eeAddress = 0;
-  EEPROM.update( eeAddress, Espera );
+  EEPROM.put( eeAddress, tiempos );
 
-  eeAddress += sizeof(unsigned long);
+/*   eeAddress += sizeof(uint32_t);
   EEPROM.update( eeAddress, Retener );
 
-  eeAddress += sizeof(unsigned long);
-  EEPROM.update( eeAddress, Despegue );  
+  eeAddress += sizeof(uint32_t);
+  EEPROM.update( eeAddress, Despegue );   */
 
 }
 
 void leenex() {
   uint32_t number;
+  uint8_t graba=false;
   nexespera.getValue(&number);
-  if (number != Espera && number >= 0 && number <= 10000){
-    Espera=(unsigned long)number;
-    grabaEEprom();
+  //number=number*100;
+  if (number != tiempos.Espera && number >= 0 && number <= 10000){
+    tiempos.Espera = number;
+    graba=true;
   }
   
   nexretener.getValue(&number);
-  if (number != Retener && number >= 0 && number <= 10000){
-    Retener=(unsigned long)number;
-    grabaEEprom();
+  //number=number*100;
+  if (number != tiempos.Retener && number >= 0 && number <= 10000){
+    tiempos.Retener = number;
+    graba=true;
   }
 
     nexdespegue.getValue(&number);
-  if (number != Despegue && number >= 0 && number <= 10000){
-    Despegue=(unsigned long)number;
-    grabaEEprom();
+    //number=number*100;
+  if (number != tiempos.Despegue && number >= 0 && number <= 10000){
+    tiempos.Despegue = number;
+    graba=true;
   }
-  
+  if (graba) grabaEEprom();
 }

@@ -64,7 +64,7 @@
 #define air2 12 //12            [K7]
 
 #define pedal A0 //4            [0]
-#define lbutt A2 //A2           [ ]
+#define lbutt A2 //A2           [ ] //selector limpieza, pasa a ser alarma tras poner pantalla Nextion
 #define horz A1 //A0            [10]
 #define vert A3 //A1            [6]
 #define semibutt A4  //         [ ]
@@ -90,3 +90,9 @@
 #define ATRAS_ABAJO 1
 
 #define PAUSA 1000 //cuanto pausa al llegar arriba desde impresión ms
+
+struct tiempos_STR{
+  uint32_t Espera;
+  uint32_t Retener;
+  uint32_t Despegue;
+};
