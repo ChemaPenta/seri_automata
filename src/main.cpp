@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * v0.7RC 2022-04-02,  
+ * v0.7RC 2022-07-01,  
  * Primera versión beta en github
  * Seguridad y pantalla
  * 
