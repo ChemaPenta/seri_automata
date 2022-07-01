@@ -1,5 +1,5 @@
 /*******************************************************
- * By Chema'22 v0.6RC.
+ * By Chema'22 v0.7RC.
  * 
  * Autómata para Seritrade
  * 

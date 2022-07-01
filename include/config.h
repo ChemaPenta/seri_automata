@@ -67,7 +67,7 @@
 #define lbutt A2 //A2           [ ] //selector limpieza, pasa a ser alarma tras poner pantalla Nextion
 #define horz A1 //A0            [10]
 #define vert A3 //A1            [6]
-#define semibutt A4  //         [ ]
+#define semibutt A4  //         [69] control de encendido
 
 #define TOFRONT true
 #define TOBACK false

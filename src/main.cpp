@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * v0.62RC 2022-04-02,  
+ * v0.7RC 2022-04-02,  
  * Primera versión beta en github
  * Seguridad y pantalla
  * 
@@ -233,6 +233,7 @@ void loop()
   
   nexLoop(nex_listen_list);
 
+/*
   //Hearbeat...
   unsigned long currentm=millis();
   unsigned long latido=800;
@@ -244,7 +245,7 @@ void loop()
     hbstate=!hbstate;
     digitalWrite(13,hbstate);
   } 
-
+*/
     //primero los botones
     leebotonera();
 
@@ -266,6 +267,8 @@ void loop()
 
           EstadoAlarma=true;
           Alarm.show();
+          para(VF1);
+          mueveVF2(TOUP);
 
         }else{ //No hay alarma, así que normal
         
