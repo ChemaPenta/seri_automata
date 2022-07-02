@@ -1,6 +1,6 @@
 /***********************************************************************************
  *     Primera versión autómata serigrafía 
- * by Chema'22 v0.7RC
+ * by Chema'22 v0.71RC
  *  Esta versión añade una pantalla Nextion para ajustar valores de pausas
  *  podría ser otra pantalla HMI, pero esta estaba a mano
  * 
@@ -66,7 +66,7 @@
 #define pedal A0 //4            [0]
 #define lbutt A2 //A2           [ ] //selector limpieza, pasa a ser alarma tras poner pantalla Nextion
 #define horz A1 //A0            [10]
-#define vert A3 //A1            [6]
+#define vert A3 //A1            [9]
 #define semibutt A4  //         [69] control de encendido
 
 #define TOFRONT true

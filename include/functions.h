@@ -1,5 +1,5 @@
 /*******************************************************
- * By Chema'22 v0.7RC.
+ * By Chema'22 v0.71RC.
  * 
  * Autómata para Seritrade
  * 
@@ -472,23 +472,51 @@ void leenex() {
   uint8_t graba=false;
   nexespera.getValue(&number);
   //number=number*100;
-  if (number != tiempos.Espera && number >= 0 && number <= 10000){
+  if (number != tiempos.Espera && number >= 0 && number < 10001){
     tiempos.Espera = number;
     graba=true;
   }
   
   nexretener.getValue(&number);
   //number=number*100;
-  if (number != tiempos.Retener && number >= 0 && number <= 10000){
+  if (number != tiempos.Retener && number >= 0 && number < 10001){
     tiempos.Retener = number;
     graba=true;
   }
 
     nexdespegue.getValue(&number);
     //number=number*100;
-  if (number != tiempos.Despegue && number >= 0 && number <= 10000){
+  if (number != tiempos.Despegue && number >= 0 && number < 10001){
     tiempos.Despegue = number;
     graba=true;
   }
   if (graba) grabaEEprom();
+}
+
+void semi_pulsado(void *ptr) {
+  //semiauto = !semiauto;
+  uint32_t dual_state;
+  nexsemi.getValue(&dual_state);
+  semiauto = dual_state;
+
+/*   nexespera.setValue(tiempos.Espera);
+  nexretener.setValue(tiempos.Retener);
+  nexdespegue.setValue(tiempos.Despegue); */
+
+}
+
+void limpia_pulsado(void *ptr) {
+  uint32_t dual_state;
+  nexlimpia.getValue(&dual_state);
+  limpieza = dual_state;
+
+ /*  leemeEEprom();
+  nexespera.setValue(tiempos.Espera);
+  nexretener.setValue(tiempos.Retener);
+  nexdespegue.setValue(tiempos.Despegue); */
+}
+
+void tiempo_pulsado(void *ptr) {
+  //lee todos los timings y ponlos en las variables y en la EEPROM
+  leenex();
 }

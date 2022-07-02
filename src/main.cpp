@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * v0.7RC 2022-07-01,  
+ * v0.71RC 2022-07-01,  
  * Primera versión beta en github
  * Seguridad y pantalla
  * 
@@ -148,28 +148,6 @@ NexTouch *nex_listen_list[] = {
 
 #include "functions.h"
 
-void semi_pulsado(void *ptr) {
-  semiauto = !semiauto;
-
-  nexespera.setValue(tiempos.Espera);
-  nexretener.setValue(tiempos.Retener);
-  nexdespegue.setValue(tiempos.Despegue);
-}
-
-void limpia_pulsado(void *ptr) {
-  limpieza = !limpieza;
-
-  leemeEEprom();
-  nexespera.setValue(tiempos.Espera);
-  nexretener.setValue(tiempos.Retener);
-  nexdespegue.setValue(tiempos.Despegue);
-}
-
-void tiempo_pulsado(void *ptr) {
-  //lee todos los timings y ponlos en las variables y en la EEPROM
-  leenex();
-}
-
 void setup()
 {
 
@@ -219,7 +197,7 @@ void setup()
   pinMode(air2,OUTPUT);
   digitalWrite(air2,HIGH);
 
-  HeartB=millis();
+  //HeartB=millis();
 
   leemeEEprom();
   nexespera.setValue(tiempos.Espera);
