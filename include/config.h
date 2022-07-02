@@ -1,8 +1,17 @@
 /***********************************************************************************
  *     Primera versión autómata serigrafía 
- * by Chema'22 v0.7RC
- *  Esta versión añade una pantalla Nextion para ajustar valores de pausas
+ * by Chema'22 v1.0
+ * 
+ *  Cambios en el I/O para usar la PCB comercial VERDE
+ * 
+ *  Pantalla Nextion para ajustar valores de pausas
  *  podría ser otra pantalla HMI, pero esta estaba a mano
+ * 
+ * *********************************************************************************
+ * Tods (o casi) los I/O pins han variado en la v1.0 al crear la nueva PCB
+ * las salidas de relé van de D9 a D2 (relé K1 al K8)
+ * y casi todas las entradas han ido a puertos analógicos
+ * *********************************************************************************
  * 
  * dos variadores de frecuencia 
  * VF1 pequeño (1HP) mueve delante detrás
@@ -45,29 +54,31 @@
 
 #define DEBUG false              //para mandar más o menos mensajes por Serial
 
-#define VF1p 2  //2             [K1]
-#define VF1dir 4 //8            [K2]
-#define VF1speed 6 //13         [K3]
+#define VF1p 9 //2  //2             [K1]
+#define VF1dir 8 //4 //8            [K2]
+#define VF1speed 7 //6 //13         [K3]
 #define VF1 true
 #define VF2 false
 
-#define VF2p 8 //7              [K4]
-#define VF2dir 10 //9           [K5]
+#define VF2p 6 //8 //7              [K4]
+#define VF2dir 5 //10 //9           [K5]
 
-#define endup 5 //6             [2]
-#define enddown 3 //5           [1]
+#define endup 11 //5 //6             [2]
+#define enddown 10 //3 //5           [1]
 
-#define endfront 7 //10         [3]
-#define endback 9 //11          [4]
+#define endfront 12 //7 //10         [3]
+#define endback A5 //9 //11          [4]
 
-#define air1 11 //3             [K6]
-#define air2 12 //12            [K7]
+#define air1 4 //11 //3             [K6]
+#define air2 3 //12 //12            [K7]
+#define free8 2 //                  [K8]
 
-#define pedal A0 //4            [0]
-#define lbutt A2 //A2           [ ] //selector limpieza, pasa a ser alarma tras poner pantalla Nextion
-#define horz A1 //A0            [10]
-#define vert A3 //A1            [6]
-#define semibutt A4  //         [69] control de encendido
+#define pedal A0 //4                 [0]
+#define lbutt A2 //A2                [99]  ALARMA tras poner pantalla Nextion
+#define horz A1 //A0                 [10]
+#define vert A3 //A1                 [9]
+#define semibutt A4  //              [69] control de encendido
+#define free12 A6 //                 [12] libre
 
 #define TOFRONT true
 #define TOBACK false

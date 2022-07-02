@@ -1,89 +1,131 @@
 /*******************************************************
- * By Chema'22 v0.7RC.
+ * By Chema'22 v1.0
  * 
  * Autómata para Seritrade
  * 
  * Funciones del programa
  * 
- * los endstops están a gnd (LOW) en not triguered
+ * los endstops arriba y abajo están a gnd (LOW) en not triguered
  * se desconectan al activarse, como tenemos un pullup
  * en estas entradas, está en HIGH (true) al activarse
+ * 
+ * los endstops delante/detrás se ponen a gnd en triguered
  * 
  * VF2 => arriba/abajo
  * VF1 => delante/detrás
  *
- * falta escribir la rutina para leer y grabar eeprom 
- * con las variables de las tres pausas
- * y pasarlo todo al Nextion
+ *******************************************************
+ * TODO hay que agrupar los millis() en una variable
+ * local al principio de las funciones  leebotonera
+ * y leestops para que los tiempos sean más ajustados
+ * DONE
  * *****************************************************/
 
 void leebotonera(){
 
+    unsigned long actual=millis();
+
   int reading=!digitalRead(pedal); //pedal 
   if(reading != lastP){
-      lastDebounceTP=millis();
+      lastDebounceTP=actual;
       lastP=reading;
   }
-  if((millis()-lastDebounceTP)>=debounceDelay){
+  if((actual-lastDebounceTP)>=debounceDelay){
       if(reading != pedalval){
           pedalval=reading;
           //cambios=true;
+            if(DebugMode) {
+                nexpedal.setValue((uint32_t)pedalval);
+            }
       }
+
   }
 
   reading = !digitalRead(horz); //boton delante/detrás
   //if(hval != lasthval){
   if(reading != lasthval){
-      lastDebounceTh=millis();
+      lastDebounceTh=actual;
       lasthval=reading;
   }
-  if((millis()-lastDebounceTh)>=debounceDelay){
+  if((actual-lastDebounceTh)>=debounceDelay){
       if (reading != hval){
         hval = reading;
         //lasthval = hval;
         //cambios=true;
+      if(DebugMode) {
+        nexhor.setValue((uint32_t)hval);
+      }           
       }
+   
   }
   reading=!digitalRead(vert); //botón subir/bajar
 
   if(reading != lastvval){
-      lastDebounceTv=millis();
+      lastDebounceTv=actual;
       lastvval=reading;
   }
-  if((millis()-lastDebounceTv)>=debounceDelay){
+  if((actual-lastDebounceTv)>=debounceDelay){
       if(reading != vval){
           vval=reading;
-
+      if(DebugMode) {
+        nexver.setValue((uint32_t)vval);
+      }      
       }
+
   }
-    reading=digitalRead(lbutt); //boton limpieza ******pasará a ser sensor presencia/alarma******
+    reading=digitalRead(lbutt); //alarma******
 
    if(reading != lastalarma){
-      lastDebounceAL=millis();
+      lastDebounceAL=actual;
       lastalarma=reading;
   }
-  if((millis()-lastDebounceAL)>=debounceDelay){
+  if((actual-lastDebounceAL)>=debounceDelay){
       if(reading != alarma){
           alarma=reading;
-          cambios=true;
+          //cambios=true;
+      if(DebugMode) {
+        nexalr.setValue((uint32_t)alarma);
+      }             
       }
+   
   } 
    reading=!digitalRead(semibutt); //botón semiauto ******pasará a activación********
 
    if(reading != lastactivado){
-      lastDebounceAC=millis();
+      lastDebounceAC=actual;
       lastactivado=reading;
   }
-  if((millis()-lastDebounceAC)>=debounceDelay){
+  if((actual-lastDebounceAC)>=debounceDelay){
       if(reading != activado){
           activado=reading;
-          cambios=true;
+          //cambios=true;
+      if(DebugMode) {
+        nexenc.setValue((uint32_t)activado);
+      }                
       }
+
+  } 
+
+   reading=!digitalRead(free12); //botón libre de momento
+
+   if(reading != lastfree12){
+      lastDebounceF12=actual;
+      lastfree12=reading;
+  }
+  if((actual-lastDebounceF12)>=debounceDelay){
+      if(reading != F12){
+          F12=reading;
+          //cambios=true;
+      if(DebugMode) {
+        nexfree.setValue((uint32_t)F12);
+      }             
+      }
+   
   } 
 
     //nexsemiauto;
 }
-void printa()
+/* void printa()
 {
   //Serial.println("********************************************************************");
   Serial.print(" Front: ");
@@ -143,22 +185,28 @@ void printa()
   Serial.print(" Semi: ");
   Serial.println(semiauto);
   //delay(2000);
-}
+} */
 void leestops(){
+
+    unsigned long actual=millis();
   
   int reading=!digitalRead(endup); //Arriba
     //Serial.print(reading);
   if(reading != lastupval){
-      lastDebounceUP=millis();
+      lastDebounceUP=actual;
       lastupval=reading;
   }
-  if((millis()-lastDebounceUP) >= debounceDelayS){
+  if((actual-lastDebounceUP) >= debounceDelayS){
       if(reading != upval){
           upval=reading;
           //cambios=true;
           //position-=1;
           //if(upval) posv=0;
+      if(DebugMode) {
+        nexenup.setValue((uint32_t)upval);
+      }             
       }
+   
   }
 
 
@@ -166,16 +214,20 @@ void leestops(){
   reading=!digitalRead(enddown); //Abajo
     //Serial.print(reading);
   if(reading != lastdownval){
-      lastDebounceDW=millis();
+      lastDebounceDW=actual;
       lastdownval=reading;
   }
-  if((millis()-lastDebounceDW)>=debounceDelayS){
+  if((actual-lastDebounceDW)>=debounceDelayS){
       if(reading != downval){
           downval=reading;
           //cambios=true;
           //position+=1;
           //if(downval) posv=1;
+      if(DebugMode) {
+        nexendw.setValue((uint32_t)downval);
+      }                
       }
+
   }
 
 
@@ -186,37 +238,49 @@ void leestops(){
   reading=digitalRead(endfront);
     //Serial.print(reading);
   if(reading != lastfrontval){
-      lastDebounceFR=millis();
+      lastDebounceFR=actual;
       lastfrontval=reading;
   }
-  if((millis()-lastDebounceFR)>=debounceDelayS){
+  if((actual-lastDebounceFR)>=debounceDelayS){
       if(reading != frontval){
           frontval=reading;
           //cambios=true;
           //position+=2;
           //if(frontval) posh=2;
+      if(DebugMode) {
+        nexenft.setValue((uint32_t)frontval);
+      }                
       }
+
   }
 
 
 
   //backval=digitalRead(endback);
-    reading=digitalRead(endback);
+     //reading=digitalRead(free12);
+     reading=digitalRead(endback);
     //Serial.println(reading);
   if(reading != lastbackval){
-      lastDebounceFR=millis();
+      lastDebounceBK=actual;
       lastbackval=reading;
   }
-  if((millis()-lastDebounceBK)>=debounceDelayS){
+  if((actual-lastDebounceBK)>=debounceDelayS){
+  
       if(reading != backval){
           backval=reading;
           //cambios=true;
           //position-=2;
-         // if(backval) posh=0;
+         // if(backval) posh=0; 
+
+        if(DebugMode) {
+            nexenbk.setValue((uint32_t)backval);
+        }            
       }
+   
   }
   //if (cambios) position=posh+posv;
-    position=0;
+    position=99;
+    if(upval || backval) position=0;
     if(downval) position+=1;
     if(frontval) position+=2;
 }
@@ -329,18 +393,18 @@ void checkbut(void){
                     break;
                 case DELANTE_ABAJO:
                     //delante abajo
-                    if(DEBUG) Serial.print(" estamos para parar ");
-                    if(DEBUG) Serial.print(pausado2);
+/*                     if(DEBUG) Serial.print(" estamos para parar ");
+                    if(DEBUG) Serial.print(pausado2); */
                     if(pausado2){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
-                        if(DEBUG) Serial.print("estamos esperando");
+                        //if(DEBUG) Serial.print("estamos esperando");
                         if(currentm-timePause2 >= tiempos.Espera){ //ESPERA
                             mueveVF2(TOUP);
                             pausado2 = false;
                             if(!limpieza) valvulas(true);
                         }
                     }else{
-                        if(DEBUG) Serial.print("estamos pausando");
+                        //if(DEBUG) Serial.print("estamos pausando");
                         pausado2=true;
                         timePause2=millis();
                     }                    
@@ -409,86 +473,237 @@ void checkbut(void){
     }
 }
 
-/* void leemeEEprom() {
-  int eeAddress = 0;
-  EEPROM.get( eeAddress, Espera );
-
-  if (Espera < 0 or Espera > 10000) {
-    Espera = 0;
-    EEPROM.put(eeAddress, Espera);
-  }
-  eeAddress += sizeof(uint32_t);
-  EEPROM.get( eeAddress, Retener );
-
-  if (Retener < 0 or Retener > 10000) {
-    Retener = 0;
-    EEPROM.put(eeAddress, Retener);
-  }
-  eeAddress += sizeof(uint32_t);
-  EEPROM.get( eeAddress, Despegue );
-
-  if (Despegue < 0 or Despegue > 10000) {
-    Despegue = 0;
-    EEPROM.put(eeAddress, Despegue);
-  }
-} */
 
 void leemeEEprom() {
   int eeAddress = 0;
-  uint8_t graba=false;
-  EEPROM.get( eeAddress, tiempos );
+  //uint8_t graba=false;
+  uint32_t espera, retener, despegue;
+  //EEPROM.get( eeAddress, tiempos );
+  EEPROM.get( eeAddress, espera);
+  tiempos.Espera=espera;
+  eeAddress+=sizeof(uint32_t);
+  EEPROM.get( eeAddress, retener);
+  tiempos.Retener=retener;
+  eeAddress+=sizeof(uint32_t);
+  EEPROM.get( eeAddress, despegue);
+  tiempos.Despegue=despegue;
+  
 
-  if (tiempos.Espera < 0 or tiempos.Espera > 10000) {
+ /*  if (tiempos.Espera << 0 or tiempos.Espera >= 10001) {
     tiempos.Espera = 0;
     graba=true;
   }
   
-  if (tiempos.Retener < 0 or tiempos.Retener > 10000) {
+  if (tiempos.Retener << 0 or tiempos.Retener >= 10001) {
     tiempos.Retener = 0;
     graba=true;
   }
 
-  if (tiempos.Despegue < 0 or tiempos.Despegue > 10000) {
+  if (tiempos.Despegue << 0 or tiempos.Despegue >= 10001) {
     tiempos.Despegue = 0;
     graba=true;
-  }
-  if(graba) EEPROM.put(eeAddress,tiempos);
+  } */
+/*   if(graba) {
+    EEPROM.put(eeAddress,tiempos);
+  digitalWrite(13,true);
+  delay(5000);  
+  } */
+
+/*   tiempos.Espera = 0;
+  tiempos.Retener = 0;
+  tiempos.Despegue = 0; */
+
+
+    //uint32_t dato=tiempos.Espera;
+    //uint32_t dato=1450;
+    nexespera.setValue(tiempos.Espera);
+    //dato=tiempos.Retener;
+    nexretener.setValue(tiempos.Retener);
+    //dato=tiempos.Despegue;
+    nexdespegue.setValue(tiempos.Despegue);
 }
 
-void grabaEEprom() {
+void grabaEEprom(int parte) {
   int eeAddress = 0;
-  EEPROM.put( eeAddress, tiempos );
+  int salto2=sizeof(uint32_t);
+  int salto3=salto2*2;
+  uint32_t espera, retener, despegue;
+  
+  switch(parte){
+    case 1:
+        eeAddress = 0;
+        espera=tiempos.Espera;
+        EEPROM.put( eeAddress, espera);
+    break;
+    
+    case 2:
+        eeAddress = salto2;
+        retener=tiempos.Retener;
+        EEPROM.put( eeAddress, retener);
+    break;
 
-/*   eeAddress += sizeof(uint32_t);
-  EEPROM.update( eeAddress, Retener );
-
-  eeAddress += sizeof(uint32_t);
-  EEPROM.update( eeAddress, Despegue );   */
+    case 3:
+        eeAddress = salto3;
+        despegue=tiempos.Despegue;
+        EEPROM.put( eeAddress, despegue);        
+    break;
+  }
+  
+  //EEPROM.put( eeAddress, tiempos );
+  digitalWrite(13,true);
+  delay(5000);
 
 }
 
 void leenex() {
   uint32_t number;
-  uint8_t graba=false;
+  //uint8_t graba=false;
   nexespera.getValue(&number);
   //number=number*100;
-  if (number != tiempos.Espera && number >= 0 && number <= 10000){
+  //if (number != tiempos.Espera) { // && number >= 0 && number <= 10000){
     tiempos.Espera = number;
-    graba=true;
-  }
+    //graba=true;
+  //}
   
   nexretener.getValue(&number);
   //number=number*100;
-  if (number != tiempos.Retener && number >= 0 && number <= 10000){
+  //if (number != tiempos.Retener){ // && number >= 0 && number <= 10000){
     tiempos.Retener = number;
-    graba=true;
-  }
+    //graba=true;
+  //}
 
     nexdespegue.getValue(&number);
     //number=number*100;
-  if (number != tiempos.Despegue && number >= 0 && number <= 10000){
+  //if (number != tiempos.Despegue){ // && number >= 0 && number <= 10000){
     tiempos.Despegue = number;
-    graba=true;
-  }
-  if (graba) grabaEEprom();
+    //graba=true;
+  //}
+  //if (graba) 
+  //grabaEEprom();
+}
+
+void semi_pulsado(void *ptr) {
+  //semiauto = !semiauto;
+  uint32_t dual_state;
+/*   nexsemi.getValue(&dual_state);
+  if (dual_state==1){
+    semiauto = true;
+  }else{
+    semiauto=false;
+  } */
+  semiauto=!semiauto;
+  dual_state=semiauto;
+  nexsemi.setValue(dual_state);
+
+}
+
+void limpia_pulsado(void *ptr) {
+  uint32_t dual_state;
+/*   
+  nexlimpia.getValue(&dual_state);
+  limpieza = dual_state;
+ */
+    limpieza=!limpieza;
+    dual_state=limpieza;
+    nexlimpia.setValue(dual_state);
+}
+
+void tiempo_pulsado(void *ptr) {
+  //lee todos los timings y ponlos en las variables y en la EEPROM
+  leenex();
+}
+
+void debugea(void *ptr){
+    //se ha pulsado el botón que nos lleva a la pantalla de debug...
+    DebugMode=true;
+}
+
+void nodebugea(void *ptr){
+    //se ha pulsado el botón que nos saca de la pantalla de debug...
+    DebugMode=false;
+}
+
+void rele_pulsado(void *ptr){
+    uint32_t number;
+    //uint8_t number;
+    nexrelex.getValue(&number);
+
+    if((number-10) >= 9)
+    {
+        //encendiendo el rele
+        //cmd_rele(number-20,true);
+        digitalWrite(reles[number-20],true);
+
+    } else {
+
+        //apagando rele
+        //cmd_rele(number-10,false);
+        digitalWrite(reles[number-10],false);
+    }
+
+}
+
+void pagina0(void *ptr){
+    //se ha llegado a la página 0 de la pantalla Nextion
+    //modo normal
+    DebugMode=false;
+    if(iniciando){
+        iniciando=false;
+    }else{
+       // leenex();
+    }
+}
+
+void pagina5(void *ptr){
+    //se ha llegado a la página 5 de la pantalla Nextion
+    //modo debug
+    DebugMode=true;
+}
+
+void deblee(void *ptr){
+    leemeEEprom();
+    nexdebesp.setValue(tiempos.Espera);
+    nexdebret.setValue(tiempos.Retener);
+    nexdebdes.setValue(tiempos.Despegue);
+}
+void debgraba(void *ptr){
+    uint32_t num;
+    nexdebesp.getValue(&num);
+    tiempos.Espera=num;
+    grabaEEprom(1);
+    nexdebret.getValue(&num);
+    tiempos.Retener=num;
+    grabaEEprom(2);
+    nexdebdes.getValue(&num);    
+    tiempos.Despegue=num;
+    grabaEEprom(3);
+}
+void ActualizaNex(){
+    nexespera.setValue(tiempos.Espera);
+    nexretener.setValue(tiempos.Retener);
+    nexdespegue.setValue(tiempos.Despegue);
+}
+void setespera(void *ptr){
+    //se ha pulsado el botón de grabar espera en page1
+    uint32_t num;
+    nexEsperaSet.getValue(&num);
+    tiempos.Espera=num;
+    ActualizaNex();
+    grabaEEprom(1);
+}
+void setretener(void *ptr){
+    //se ha pulsado el botón de grabar espera en page1
+    uint32_t num;
+    nexRetenerSet.getValue(&num);
+    tiempos.Retener=num;
+    ActualizaNex();
+    grabaEEprom(2);
+}
+void setdespegue(void *ptr){
+    //se ha pulsado el botón de grabar espera en page1
+    uint32_t num;
+    nexDespegueSet.getValue(&num);
+    tiempos.Despegue=num;
+    ActualizaNex();
+    grabaEEprom(3);
 }
