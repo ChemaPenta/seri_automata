@@ -1,15 +1,10 @@
 /***********************************************************************************
  *     Primera versión autómata serigrafía 
-<<<<<<< HEAD
  * by Chema'22 v1.0
  * 
  *  Cambios en el I/O para usar la PCB comercial VERDE
  * 
  *  Pantalla Nextion para ajustar valores de pausas
-=======
- * by Chema'22 v0.71RC
- *  Esta versión añade una pantalla Nextion para ajustar valores de pausas
->>>>>>> 854a1c7baa9e7c618e861895e965a767f962de38
  *  podría ser otra pantalla HMI, pero esta estaba a mano
  * 
  * *********************************************************************************

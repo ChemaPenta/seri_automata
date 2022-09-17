@@ -1,9 +1,5 @@
 /*******************************************************
-<<<<<<< HEAD
  * By Chema'22 v1.0
-=======
- * By Chema'22 v0.71RC.
->>>>>>> 854a1c7baa9e7c618e861895e965a767f962de38
  * 
  * Autómata para Seritrade
  * 
@@ -127,75 +123,14 @@ void leebotonera(){
    
   } 
 
-    //nexsemiauto;
 }
-/* void printa()
-{
-  //Serial.println("********************************************************************");
-  Serial.print(" Front: ");
-  Serial.print(frontval);
-  Serial.print(" Back: ");
-  Serial.print(backval);
-  Serial.print(" Up: ");
-  Serial.print(upval);
-  Serial.print(" Dw: ");
-  Serial.print(downval);
-  Serial.print(" BV: ");
-  Serial.print(vval);
-  Serial.print(" BH: ");
-  Serial.print(hval);
-  Serial.print(" P: ");
-  Serial.print(pedalval);
-  Serial.print(" P2: ");
-  Serial.print(pedal2);
-  Serial.print(" movement: ");
-  switch (movement)
-  {
-  case PABAJO:
-      Serial.print("2DOWN");
-      break;
-  case PARRIBA:
-      Serial.print("2UP");
-      break;
-  case PALANTE:
-      Serial.print("2FRONT");
-      break;
-  case PATRAS:
-      Serial.print("2BACK");
-      break;
-  case PARADO:
-      Serial.print("PARADO");
-      break;
-  }
-  
-  Serial.print(" posit: ");
-  switch (position)
-  {
-  case ATRAS_ARRIBA:
-      Serial.print("atras-arriba");
-      break;
-  case ATRAS_ABAJO:
-      Serial.print("atras-abajo");
-      break;
-  case DELANTE_ABAJO:
-      Serial.print("delante-abajo");
-      break;
-  case DELANTE_ARRIBA:
-      Serial.print("delante-arriba");
-      break;
-  }
-  Serial.print(" Limp: ");
-  Serial.print(limpieza);
-  Serial.print(" Semi: ");
-  Serial.println(semiauto);
-  //delay(2000);
-} */
+
 void leestops(){
 
     unsigned long actual=millis();
   
   int reading=!digitalRead(endup); //Arriba
-    //Serial.print(reading);
+
   if(reading != lastupval){
       lastDebounceUP=actual;
       lastupval=reading;
@@ -203,20 +138,18 @@ void leestops(){
   if((actual-lastDebounceUP) >= debounceDelayS){
       if(reading != upval){
           upval=reading;
-          //cambios=true;
-          //position-=1;
-          //if(upval) posv=0;
-      if(DebugMode) {
-        nexenup.setValue((uint32_t)upval);
-      }             
+
+        if(DebugMode) {
+            nexenup.setValue((uint32_t)upval);
+        }             
       }
    
   }
 
 
-  //downval=!digitalRead(enddown);
+
   reading=!digitalRead(enddown); //Abajo
-    //Serial.print(reading);
+ 
   if(reading != lastdownval){
       lastDebounceDW=actual;
       lastdownval=reading;
@@ -224,23 +157,16 @@ void leestops(){
   if((actual-lastDebounceDW)>=debounceDelayS){
       if(reading != downval){
           downval=reading;
-          //cambios=true;
-          //position+=1;
-          //if(downval) posv=1;
-      if(DebugMode) {
-        nexendw.setValue((uint32_t)downval);
-      }                
+
+        if(DebugMode) {
+            nexendw.setValue((uint32_t)downval);
+        }                
       }
 
   }
 
-
-
-  //(upval || downval) ? movev = false : movev = true;
-
-  //frontval=digitalRead(endfront);
   reading=digitalRead(endfront);
-    //Serial.print(reading);
+
   if(reading != lastfrontval){
       lastDebounceFR=actual;
       lastfrontval=reading;
@@ -248,22 +174,16 @@ void leestops(){
   if((actual-lastDebounceFR)>=debounceDelayS){
       if(reading != frontval){
           frontval=reading;
-          //cambios=true;
-          //position+=2;
-          //if(frontval) posh=2;
-      if(DebugMode) {
-        nexenft.setValue((uint32_t)frontval);
-      }                
+         
+        if(DebugMode) {
+            nexenft.setValue((uint32_t)frontval);
+        }                
       }
 
   }
 
+  reading=digitalRead(endback);
 
-
-  //backval=digitalRead(endback);
-     //reading=digitalRead(free12);
-     reading=digitalRead(endback);
-    //Serial.println(reading);
   if(reading != lastbackval){
       lastDebounceBK=actual;
       lastbackval=reading;
@@ -272,9 +192,6 @@ void leestops(){
   
       if(reading != backval){
           backval=reading;
-          //cambios=true;
-          //position-=2;
-         // if(backval) posh=0; 
 
         if(DebugMode) {
             nexenbk.setValue((uint32_t)backval);
@@ -282,8 +199,8 @@ void leestops(){
       }
    
   }
-  //if (cambios) position=posh+posv;
-    position=99;
+
+    position=0;
     if(upval || backval) position=0;
     if(downval) position+=1;
     if(frontval) position+=2;
@@ -346,15 +263,15 @@ void valvulas(uint8_t sentido){
 void checkbut(void){
  
     if(semiauto){ //el selector manual/semi está en semi
-       // if(!movement){   //y estamos parados
+       
        if(movement) position=99;
             // para saber si se acaba de pulsar pedal uso una 2a variable de estado
             if(pedalval){
                 if(!pedal2){ //se acaba de pulsar el pedal
                     if (position==ATRAS_ARRIBA){ //está en la posición correcta... empezamos el workflow
-                    pedal2=true;
-                    mueveVF2(TODOWN);
-                    //cambios=true;
+                        pedal2=true;
+                        mueveVF2(TODOWN);
+                        //cambios=true;
                     }
                 }
 
@@ -382,7 +299,7 @@ void checkbut(void){
                     break;
                 case DELANTE_ARRIBA:
                     //delante arriba
-                    //Pausa???????????????????????????
+                 
                     if(pausado3){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
                         if(currentm-timePause3 >= tiempos.Retener){ //RETENER
@@ -397,18 +314,17 @@ void checkbut(void){
                     break;
                 case DELANTE_ABAJO:
                     //delante abajo
-/*                     if(DEBUG) Serial.print(" estamos para parar ");
-                    if(DEBUG) Serial.print(pausado2); */
+
                     if(pausado2){ // ya hemos pasado por esto, comprobar time
                         unsigned long currentm=millis();
-                        //if(DEBUG) Serial.print("estamos esperando");
+                       
                         if(currentm-timePause2 >= tiempos.Espera){ //ESPERA
                             mueveVF2(TOUP);
                             pausado2 = false;
                             if(!limpieza) valvulas(true);
                         }
                     }else{
-                        //if(DEBUG) Serial.print("estamos pausando");
+                      
                         pausado2=true;
                         timePause2=millis();
                     }                    
@@ -493,37 +409,10 @@ void leemeEEprom() {
   tiempos.Despegue=despegue;
   
 
- /*  if (tiempos.Espera << 0 or tiempos.Espera >= 10001) {
-    tiempos.Espera = 0;
-    graba=true;
-  }
-  
-  if (tiempos.Retener << 0 or tiempos.Retener >= 10001) {
-    tiempos.Retener = 0;
-    graba=true;
-  }
-
-  if (tiempos.Despegue << 0 or tiempos.Despegue >= 10001) {
-    tiempos.Despegue = 0;
-    graba=true;
-  } */
-/*   if(graba) {
-    EEPROM.put(eeAddress,tiempos);
-  digitalWrite(13,true);
-  delay(5000);  
-  } */
-
-/*   tiempos.Espera = 0;
-  tiempos.Retener = 0;
-  tiempos.Despegue = 0; */
-
-
-    //uint32_t dato=tiempos.Espera;
-    //uint32_t dato=1450;
     nexespera.setValue(tiempos.Espera);
-    //dato=tiempos.Retener;
+
     nexretener.setValue(tiempos.Retener);
-    //dato=tiempos.Despegue;
+
     nexdespegue.setValue(tiempos.Despegue);
 }
 
@@ -553,48 +442,33 @@ void grabaEEprom(int parte) {
     break;
   }
   
-  //EEPROM.put( eeAddress, tiempos );
+
   digitalWrite(13,true);
-  delay(5000);
+  delay(1500);
 
 }
 
 void leenex() {
   uint32_t number;
-  //uint8_t graba=false;
+
   nexespera.getValue(&number);
-  //number=number*100;
-  //if (number != tiempos.Espera) { // && number >= 0 && number <= 10000){
-    tiempos.Espera = number;
-    //graba=true;
-  //}
+
+  tiempos.Espera = number;
   
   nexretener.getValue(&number);
-  //number=number*100;
-  //if (number != tiempos.Retener){ // && number >= 0 && number <= 10000){
-    tiempos.Retener = number;
-    //graba=true;
-  //}
 
-    nexdespegue.getValue(&number);
-    //number=number*100;
-  //if (number != tiempos.Despegue){ // && number >= 0 && number <= 10000){
-    tiempos.Despegue = number;
-    //graba=true;
-  //}
-  //if (graba) 
-  //grabaEEprom();
+  tiempos.Retener = number;
+
+  nexdespegue.getValue(&number);
+
+  tiempos.Despegue = number;
+
 }
 
 void semi_pulsado(void *ptr) {
-  //semiauto = !semiauto;
+
   uint32_t dual_state;
-/*   nexsemi.getValue(&dual_state);
-  if (dual_state==1){
-    semiauto = true;
-  }else{
-    semiauto=false;
-  } */
+
   semiauto=!semiauto;
   dual_state=semiauto;
   nexsemi.setValue(dual_state);
@@ -603,10 +477,7 @@ void semi_pulsado(void *ptr) {
 
 void limpia_pulsado(void *ptr) {
   uint32_t dual_state;
-/*   
-  nexlimpia.getValue(&dual_state);
-  limpieza = dual_state;
- */
+
     limpieza=!limpieza;
     dual_state=limpieza;
     nexlimpia.setValue(dual_state);

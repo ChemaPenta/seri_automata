@@ -16,14 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
-<<<<<<< HEAD
  * v1.00 2022-08-28,  
  * Primera versión electrónica PCB comercial
-=======
- * v0.71RC 2022-07-01,  
- * Primera versión beta en github
- * Seguridad y pantalla
->>>>>>> 854a1c7baa9e7c618e861895e965a767f962de38
  * 
  * reajustar I/O para nuevo esquema electrónico
  * 
